@@ -27,7 +27,7 @@ Also includes a test **MCP Prompt** (`test_prompt`) to confirm the server connec
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+git clone https://github.com/JayantDethe26/GitHub-Server
 cd YOUR_REPO
 
 # Install dependencies
