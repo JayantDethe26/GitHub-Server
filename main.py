@@ -1,5 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 import requests
+import os
 
 # Create MCP server
 mcp = FastMCP("GitHub")
@@ -89,9 +90,10 @@ def test_prompt():
 # Run MCP Server (IMPORTANT)
 # -------------------------
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+
     mcp.run(
         transport="streamable-http",
-        host="0.0.0.0",
-        port=8000
+        port=port
     )
 

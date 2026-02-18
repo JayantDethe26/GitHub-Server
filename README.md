@@ -1,111 +1,45 @@
-# 🤖 GitHub MCP Server
+🤖 GitHub MCP Server
 
-A lightweight **Model Context Protocol (MCP)** server built with [`fastmcp`](https://github.com/jlowin/fastmcp) that exposes GitHub utilities and basic tools for use with AI assistants like Claude.
+A lightweight Model Context Protocol (MCP) server built with FastMCP that exposes GitHub utilities for AI assistants like Claude.
 
----
+This server can run:
 
-## ✨ Features
+🖥 Locally (STDIO or HTTP)
 
-| Tool | Description |
-|------|-------------|
-| `add` | Add two integers — a simple sanity-check math tool |
-| `github_repo_info` | Fetch metadata (stars, forks, language, description) for any public GitHub repo |
-| `github_get_file` | Read raw file contents from any public GitHub repository |
+🌍 Remotely (deployed to Render / cloud)
 
-Also includes a test **MCP Prompt** (`test_prompt`) to confirm the server connection is alive.
+🔌 Connected to any MCP-compatible client
 
----
+✨ Features
+Tool	Description
+add	Add two integers (connectivity test tool)
+github_repo_info	Fetch metadata (stars, forks, language, description) for any public GitHub repo
+github_get_file	Read raw file contents from any public GitHub repository
 
-## 🚀 Getting Started
+Includes a test MCP Prompt (test_prompt) to verify connection status.
 
-### Prerequisites
+🚀 How To Use This Server
+🖥 Option 1: Run Locally
+1️⃣ Install Dependencies
+pip install mcp requests
 
-- Python 3.9+
-- `pip`
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/JayantDethe26/GitHub-Server
-cd YOUR_REPO
-
-# Install dependencies
-pip install fastmcp requests
-```
-
-### Running the Server
-
-```bash
+2️⃣ Start the Server
 python server.py
-```
 
-The server will start on `http://0.0.0.0:8000` using the **Streamable HTTP** transport.
 
----
+If running in HTTP mode, it will start on:
 
-## 🛠️ Tools Reference
+http://localhost:8000
 
-### `add(a, b)`
 
-A basic math tool for testing connectivity.
+MCP endpoint:
 
-```json
-{ "a": 3, "b": 5 }
-→ 8
-```
-
----
-
-### `github_repo_info(owner, repo)`
-
-Returns key stats about a public GitHub repository.
-
-**Example:**
-```json
-{ "owner": "openai", "repo": "openai-python" }
-```
-
-**Response:**
-```
-Repository: openai/openai-python
-Description: The official Python library for the OpenAI API
-Stars: ⭐ 24000
-Forks: 3200
-Language: Python
-```
-
----
-
-### `github_get_file(owner, repo, path, branch)`
-
-Fetches the raw content of a file from a public GitHub repository. Truncates responses over 4,000 characters.
-
-**Example:**
-```json
-{
-  "owner": "JayantDethe26",
-  "repo": "IntervueAI",
-  "path": "README.md",
-  "branch": "main"
-}
-```
-
-> **Note:** `branch` defaults to `"main"` if not provided.
-
----
-
-## 🔌 Connecting to Claude (via MCP)
-
-Once the server is running, you can connect it to Claude Desktop or any MCP-compatible client by pointing to:
-
-```
 http://localhost:8000/mcp
-```
 
-In your `claude_desktop_config.json`:
+🔌 Connect to Claude (Local HTTP Mode)
 
-```json
+Add this to your claude_desktop_config.json:
+
 {
   "mcpServers": {
     "github-mcp": {
@@ -113,34 +47,99 @@ In your `claude_desktop_config.json`:
     }
   }
 }
-```
 
----
 
-## 📁 Project Structure
+Restart Claude.
 
-```
+🌍 Option 2: Use the Public Deployed Server
+
+If deployed (for example on Render), the MCP endpoint will be:
+
+https://your-app-name.onrender.com/mcp
+
+
+To use it in Claude:
+
+{
+  "mcpServers": {
+    "github-mcp": {
+      "url": "https://your-app-name.onrender.com/mcp"
+    }
+  }
+}
+
+
+Now anyone can connect without installing Python.
+
+🛠 Tool Usage Examples
+
+Once connected in Claude, you can use:
+
+🔹 Get Repo Info
+Use github-mcp github_repo_info tool for owner=openai repo=openai-python
+
+🔹 Fetch README
+Use github-mcp github_get_file tool for owner=JayantDethe26 repo=IntervueAI path=README.md
+
+🔹 Fetch File From Folder
+Use github-mcp github_get_file tool for owner=JayantDethe26 repo=IntervueAI path=src/app.py
+
+
+⚠ The path must match the full relative file path inside the repository.
+
+🧠 How It Works
+Claude (or MCP client)
+        ↓
+GitHub MCP Server
+        ↓
+GitHub REST API
+
+
+The server acts as a bridge between AI assistants and GitHub.
+
+🔐 Security Note
+
+This server currently:
+
+Accesses only public repositories
+
+Has no authentication
+
+Has no rate limiting
+
+Before production use, consider adding:
+
+API key protection
+
+Request rate limiting
+
+GitHub token support for private repos
+
+📁 Project Structure
 .
-└── server.py        # Main MCP server with all tools and prompts
-```
+└── server.py
 
----
+🧰 Built With
 
-## 🧰 Built With
+FastMCP
 
-- [FastMCP](https://github.com/jlowin/fastmcp) — MCP server framework
-- [Requests](https://requests.readthedocs.io/) — HTTP client for GitHub API calls
-- [GitHub REST API](https://docs.github.com/en/rest) — Public repository data
+Requests
 
----
+GitHub REST API
 
-## 📝 License
+🚀 Roadmap
 
-This project is open source and available under the [MIT License](LICENSE).
+Private repo support (GitHub token)
 
----
+Repo-wide search
 
-## 🙋‍♂️ Author
+Authentication layer
 
-**Jayant Dethe**  
-[GitHub](https://github.com/JayantDethe26)
+Rate limiting
+
+Docker support
+
+👨‍💻 Author
+
+Jayant Dethe
+GitHub: https://github.com/JayantDethe26
