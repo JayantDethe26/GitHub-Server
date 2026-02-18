@@ -1,4 +1,5 @@
 from mcp.server.fastmcp import FastMCP
+import uvicorn
 import requests
 import os
 
@@ -90,5 +91,10 @@ def test_prompt():
 # Run MCP Server (IMPORTANT)
 # -------------------------
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    port = int(os.environ.get("PORT", 8000))
 
+    uvicorn.run(
+        mcp.app,
+        host="0.0.0.0",
+        port=port,
+    )
