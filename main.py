@@ -91,10 +91,5 @@ def test_prompt():
 # Run MCP Server (IMPORTANT)
 # -------------------------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
+    mcp.run(transport="streamable-http")
 
-    uvicorn.run(
-        mcp.app,
-        host="0.0.0.0",
-        port=port,
-    )
