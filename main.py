@@ -1,5 +1,4 @@
-from mcp.server.fastmcp import FastMCP
-import uvicorn
+from fastmcp import FastMCP
 import requests
 import os
 
@@ -49,33 +48,46 @@ def github_repo_info(owner: str, repo: str) -> str:
 # GitHub File Fetch Tool
 # -------------------------
 @mcp.tool()
-def github_get_file(owner: str, repo: str, path: str, branch: str = "main") -> str:
+def github_get_file_by_name(owner: str, repo: str, filename: str, branch: str = "main") -> str:
     """
-    Fetch a file's content from a public GitHub repository.
+    Search the repository for a file by name and return its contents.
+    User does NOT need to provide full path.
+    """
 
-    Example:
-    owner = JayantDethe26
-    repo = IntervueAI
-    path = README.md
-    branch = main
-    """
     try:
-        raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}"
-        r = requests.get(raw_url, timeout=10)
+        # 1️⃣ Get full repo tree
+        tree_url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
+        tree_response = requests.get(tree_url, timeout=10)
 
-        if r.status_code != 200:
-            return f"File not found or error: {r.status_code}"
+        if tree_response.status_code != 200:
+            return f"Could not fetch repo tree: {tree_response.status_code}"
 
-        content = r.text
+        tree_data = tree_response.json()
 
-        # Limit size to avoid huge responses
-        if len(content) > 4000:
-            content = content[:4000] + "\n\n... (truncated)"
+        # 2️⃣ Search for file
+        for item in tree_data.get("tree", []):
+            if item["type"] == "blob" and item["path"].endswith(filename):
+                file_path = item["path"]
 
-        return content
+                # 3️⃣ Fetch raw file
+                raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{file_path}"
+                file_response = requests.get(raw_url, timeout=10)
+
+                if file_response.status_code != 200:
+                    return f"Found file but failed to fetch content: {file_response.status_code}"
+
+                content = file_response.text
+
+                if len(content) > 4000:
+                    content = content[:4000] + "\n\n... (truncated)"
+
+                return f"📂 Found at: {file_path}\n\n{content}"
+
+        return f"File '{filename}' not found in repository."
 
     except Exception as e:
-        return f"Error fetching file: {str(e)}"
+        return f"Error: {str(e)}"
+
 
 
 # -------------------------
@@ -91,5 +103,11 @@ def test_prompt():
 # Run MCP Server (IMPORTANT)
 # -------------------------
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    port = int(os.environ.get("PORT", 8000))
+    mcp.run(
+        transport="sse",
+        host="0.0.0.0",
+        port=port,
+    )
+
 
