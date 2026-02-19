@@ -104,13 +104,13 @@ def test_prompt():
 # -------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
+
     mcp.run(
         transport="streamable-http",
-        server_kwargs={
-            "host": "0.0.0.0",
-            "port": port,
-        },
+        host="0.0.0.0",
+        port=port,
     )
+
 
 
 
