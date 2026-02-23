@@ -13,4 +13,5 @@ if __name__ == "__main__":
         transport="sse",
         host="0.0.0.0",
         port=port,
+        path="/mcp"   # 🔥 ADD THIS
     )
